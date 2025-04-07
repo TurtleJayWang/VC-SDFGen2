@@ -16,18 +16,18 @@ class BaseTrainer:
         if not os.path.exists(result_dir):
             os.mkdir(result_dir)
         
+        self.model_file_names = model_file_names
+        self.loss_file_name = loss_file_name
+        self.result_dir = result_dir
+        
+        self.model_save_frequency = model_save_frequency
+        
         self.load_datasets(datasets)
         
         models_parameters = []
         for model in self.models:
             models_parameters += list(model.parameters())
         self.set_optimizer(models_parameters)
-        
-        self.model_file_names = model_file_names
-        self.loss_file_name = loss_file_name
-        self.result_dir = result_dir
-        
-        self.model_save_frequency = model_save_frequency
         
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if torch.cuda.is_available():
