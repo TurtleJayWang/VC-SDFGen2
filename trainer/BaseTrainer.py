@@ -27,8 +27,6 @@ class BaseTrainer:
         self.loss_file_name = loss_file_name
         self.result_dir = result_dir
         
-        self.scheduler = None
-        
         self.model_save_frequency = model_save_frequency
         
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
