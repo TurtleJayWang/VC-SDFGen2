@@ -32,9 +32,9 @@ class DeepSDF(nn.Module):
         self.dropout = nn.Dropout(0.2)
 
     def forward(self, latent_code, points):
-        batch_size = points.shape[0]
-        latent_code = latent_code.view(batch_size, self.latent_dim)
-        points = points.view(batch_size, 3)
+        n_models, n_samples = points.shape[0:2]
+        latent_code = latent_code.view(n_models, 1, self.latent_dim).repeat(1, n_samples, 1).view(-1, self.latent_dim)
+        points = points.view(-1, 3)
         # Concatenate the latent code and points
         x = torch.cat([latent_code, points], dim=-1)
 
