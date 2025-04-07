@@ -40,15 +40,15 @@ class BaseTrainer:
         
         for e in range(self.start_epoch, self.epochs):
             epoch = e + 1
-            self.epoch_train(epoch)
+            epoch_loss = self.epoch_train(epoch)
             
-            self.losses.append(self.loss)
+            self.losses.append(epoch_loss)
 
             if e % self.model_save_frequency == 0:
                 self.save_models(epoch)
                 self.save_loss()
                 
-            yield e, self.losses
+            yield epoch, self.losses
         
     def epoch_train(self, epoch):
         """In epoch train, we will train the model for one epoch. All you need to do is manage the tensor dimensions and the data loader."""

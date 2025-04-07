@@ -39,7 +39,7 @@ class DeepSDFTrainer(BaseTrainer):
         
     def epoch_train(self, epoch):
         self.deepsdf_model.train()
-        self.epoch_loss = 0
+        epoch_loss = 0
         for i, (points, sdfs, indices) in enumerate(self.deepsdf_train_dataloader):
             self.optimizer.zero_grad()
             points, sdfs = points.to(self.device), sdfs.to(self.device)
@@ -56,10 +56,10 @@ class DeepSDFTrainer(BaseTrainer):
             loss.backward()
             self.optimizer.step()
             
-            self.epoch_loss += loss.item()
+            epoch_loss += loss.item()
             
         self.scheduler.step()
-        return self.epoch_loss
+        return epoch_loss
 
 if __name__ == "__main__":
     from model.DeepSDF import DeepSDF
