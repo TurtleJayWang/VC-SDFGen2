@@ -43,7 +43,6 @@ class DeepSDFTrainer(BaseTrainer):
         for i, (points, sdfs, indices) in enumerate(self.deepsdf_train_dataloader):
             self.optimizer.zero_grad()
             points, sdfs = points.to(self.device), sdfs.to(self.device)
-            points = points.view(-1, 3)
             sdfs = sdfs.view(-1, 1)
             
             latents = self.embeddings(indices.to(self.device))
