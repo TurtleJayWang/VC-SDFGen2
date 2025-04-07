@@ -12,7 +12,7 @@ import random
 from math import sqrt
 from torch.optim.lr_scheduler import StepLR
 
-class VCCNFTraining(BaseTrainer):
+class VCCNFTrainer(BaseTrainer):
     def __init__(self, vccnf_model, dataset, result_dir, epochs, batch_size, embedding):
         self.epochs = epochs
         self.batch_size = batch_size
