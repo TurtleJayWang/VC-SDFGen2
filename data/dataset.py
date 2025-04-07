@@ -25,7 +25,7 @@ class ShapeNetSDF(Dataset):
         data = np.load(file_path)
         return torch.from_numpy(data["points"]), torch.from_numpy(data["sdfs"])
 
-class ShapeNetVoxel64(Dataset):
+class ShapeNetVoxel32(Dataset):
     def __init__(self, path, used_categories="All"):
         category_names = os.listdir(path)
         self.voxels = []
