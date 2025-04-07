@@ -49,7 +49,7 @@ class DeepSDFTrainer(BaseTrainer):
             latents = latents.view(-1, self.latent_dim)
             
             # Forward pass
-            sdf_preds = self.deepsdf_model(points, points)
+            sdf_preds = self.deepsdf_model(latents, points)
             
             # Compute loss
             loss = F.l1_loss(sdf_preds.view(-1), sdfs.view(-1))
