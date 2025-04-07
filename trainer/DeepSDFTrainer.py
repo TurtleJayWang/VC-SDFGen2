@@ -35,11 +35,11 @@ class DeepSDFTrainer(BaseTrainer):
     def set_optimizer(self, parameters):
         self.optimizer = torch.optim.Adam(parameters, lr=1e-3)
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=500, gamma=0.5)
+        self.scheduler.last_epoch = self.get_latest_epoch() - 1
         
     def epoch_train(self, epoch):
         self.deepsdf_model.train()
         self.epoch_loss = 0
-        self.scheduler.step(epoch)
         for i, (points, sdfs, indices) in enumerate(self.deepsdf_train_dataloader):
             self.optimizer.zero_grad()
             points, sdfs = points.to(self.device), sdfs.to(self.device)
@@ -58,6 +58,8 @@ class DeepSDFTrainer(BaseTrainer):
             self.optimizer.step()
             
             self.epoch_loss += loss.item()
+            
+        self.scheduler.step()
         return self.epoch_loss
 
 if __name__ == "__main__":
