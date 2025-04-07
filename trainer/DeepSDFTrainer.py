@@ -46,7 +46,7 @@ class DeepSDFTrainer(BaseTrainer):
             points = points.view(-1, 3)
             sdfs = sdfs.view(-1, 1)
             
-            latents = self.embeddings(indices)
+            latents = self.embeddings(indices.to(self.device))
             latents = latents.view(-1, self.latent_dim)
             
             # Forward pass
