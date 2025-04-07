@@ -26,6 +26,7 @@ class DeepSDFTrainer(BaseTrainer):
             model_save_frequency
         )
         
+        self.result_dir = super().result_dir
         self.deepsdf_model = self.models[0]
     
     def load_datasets(self, datasets):

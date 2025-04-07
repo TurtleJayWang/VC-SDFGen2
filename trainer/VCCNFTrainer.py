@@ -25,6 +25,8 @@ class VCCNFTrainer(BaseTrainer):
             model_save_frequency=100
         )
 
+        self.result_dir = super().result_dir
+
         self.latent_dim = self.model.latent_dim
         self.embeddings = embedding
         
