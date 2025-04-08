@@ -18,7 +18,7 @@ class BaseTrainer:
         
         self.model_file_names = list(self.model_infos.keys())
         self.models = []
-        for model_name, model_info in self.model_infos:
+        for model_name, model_info in self.model_infos.items():
             self.models.append(model_info["model"])
         
         self.loss_file_name = loss_file_name
@@ -29,7 +29,7 @@ class BaseTrainer:
         self.load_datasets(datasets)
         
         model_lr = {}
-        for model_name, model_info in self.model_infos:
+        for model_name, model_info in self.model_infos.items():
             model = model_info["model"]
             lr = model_info["init_lr"]
             model_lr[model_name] = {
