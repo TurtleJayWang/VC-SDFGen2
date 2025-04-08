@@ -53,7 +53,7 @@ class BaseTrainer:
             
             self.losses.append(epoch_loss)
 
-            if e % self.model_save_frequency == 0:
+            if epoch % self.model_save_frequency == 0:
                 self.save_models(epoch)
                 self.save_loss()
                 
