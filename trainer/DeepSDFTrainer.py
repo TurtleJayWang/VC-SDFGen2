@@ -13,16 +13,21 @@ import numpy as np
 from math import sqrt
 
 class DeepSDFTrainer(BaseTrainer):
-    def __init__(self, deepsdf_model, deepsdf_dataset, epochs, batch_size, results_dir, model_save_frequency=100):
+    def __init__(self, deepsdf_model_infos, deepsdf_dataset, epochs, batch_size, results_dir, model_save_frequency=100):
         self.latent_dim = deepsdf_model.latent_dim
         self.embeddings = nn.Embedding(len(deepsdf_dataset), self.latent_dim)
         torch.nn.init.normal_(self.embeddings.weight.data, 0, 1 / sqrt(self.latent_dim))
         
+        deepsdf_model_infos["latent_codes"] = {
+            "model" : self.embeddings,
+            "init_lr" : 1e-3
+        }
+        
         super().__init__(
-            [deepsdf_model, self.embeddings], [deepsdf_dataset], 
+            deepsdf_model_infos, [deepsdf_dataset], 
             epochs, batch_size,
             results_dir,
-            "losses_deepsdf_train", ["deepsdf_model", "latent_codes"], 
+            "losses_deepsdf_train", 
             model_save_frequency
         )
         
@@ -32,8 +37,8 @@ class DeepSDFTrainer(BaseTrainer):
         self.deepsdf_dataset = datasets[0]
         self.deepsdf_train_dataloader = DataLoader(self.deepsdf_dataset, batch_size=self.batch_size, shuffle=True)
         
-    def set_optimizer(self, parameters):
-        self.optimizer = torch.optim.Adam(parameters, lr=1e-3)
+    def set_optimizer(self, model_lr : dict):
+        self.optimizer = torch.optim.Adam(list(model_lr.keys()))
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=500, gamma=0.5)
         self.scheduler.last_epoch = self.get_latest_epoch() - 1
         
@@ -52,7 +57,7 @@ class DeepSDFTrainer(BaseTrainer):
             sdf_preds = self.deepsdf_model(latents, points)
             
             # Compute loss
-            loss = F.l1_loss(sdf_preds.view(-1), sdfs.view(-1))
+            loss = F.l1_loss(sdf_preds.view(-1), sdfs.view(-1), reduction="sum")
             loss.backward()
             self.optimizer.step()
             

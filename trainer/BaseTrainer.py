@@ -8,15 +8,19 @@ import random
 from math import sqrt
 
 class BaseTrainer:
-    def __init__(self, models, datasets, epochs, batch_size, result_dir, loss_file_name, model_file_names, model_save_frequency=100):
-        self.models = models
+    def __init__(self, model_infos : dict, datasets, epochs, batch_size, result_dir, loss_file_name, model_save_frequency=100):
+        self.model_infos = model_infos
         self.epochs = epochs
         self.batch_size = batch_size
         
         if not os.path.exists(result_dir):
             os.mkdir(result_dir)
         
-        self.model_file_names = model_file_names
+        self.model_file_names = list(self.model_infos.keys())
+        self.models = []
+        for model_name, model_info in self.model_infos:
+            self.models.append(model_info["model"])
+        
         self.loss_file_name = loss_file_name
         self.result_dir = result_dir
         
@@ -24,10 +28,15 @@ class BaseTrainer:
         
         self.load_datasets(datasets)
         
-        models_parameters = []
-        for model in self.models:
-            models_parameters += list(model.parameters())
-        self.set_optimizer(models_parameters)
+        model_lr = {}
+        for model_name, model_info in self.model_infos:
+            model = model_info["model"]
+            lr = model_info["init_lr"]
+            model_lr[model_name] = {
+                "params" : model.parameters(),
+                "lr" : lr
+            }
+        self.set_optimizer(model_lr)
         
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if torch.cuda.is_available():
@@ -57,7 +66,7 @@ class BaseTrainer:
     def load_datasets(self, datasets):
         pass
         
-    def set_optimizer(self, parameters):
+    def set_optimizer(self, model_lr : dict):
         pass
     
     def pre_train(self):
