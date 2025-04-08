@@ -14,7 +14,9 @@ from math import sqrt
 
 class DeepSDFTrainer(BaseTrainer):
     def __init__(self, deepsdf_model_infos, deepsdf_dataset, epochs, batch_size, results_dir, model_save_frequency=100):
-        self.latent_dim = deepsdf_model.latent_dim
+        self.deepsdf_model = deepsdf_model_infos["deepsdf"]["model"]
+        
+        self.latent_dim = self.deepsdf_model.latent_dim
         self.embeddings = nn.Embedding(len(deepsdf_dataset), self.latent_dim)
         torch.nn.init.normal_(self.embeddings.weight.data, 0, 1 / sqrt(self.latent_dim))
         
@@ -30,8 +32,6 @@ class DeepSDFTrainer(BaseTrainer):
             "losses_deepsdf_train", 
             model_save_frequency
         )
-        
-        self.deepsdf_model = self.models[0]
     
     def load_datasets(self, datasets):
         self.deepsdf_dataset = datasets[0]
