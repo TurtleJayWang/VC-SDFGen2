@@ -43,6 +43,9 @@ class BaseTrainer:
             print(f"Using GPU: {torch.cuda.get_device_name(0)}")
         else:
             print("Using CPU")
+            
+    def __len__(self):
+        return self.epochs - self.get_latest_epoch()
         
     def __iter__(self):
         self.pre_train()
@@ -71,14 +74,14 @@ class BaseTrainer:
     
     def pre_train(self):
         self.load_loss()
-        
-        for i, model in enumerate(self.models):
-            self.models[i] = model.to(self.device)
-            self.models[i].train()
     
         self.start_epoch = self.get_latest_epoch()
         if self.start_epoch > 0:
             self.load_models(self.start_epoch)
+            
+        for i, model in enumerate(self.models):
+            self.models[i] = model.to(self.device)
+            self.models[i].train()
     
     def save_models(self, epoch):
         for i, model in enumerate(self.models):
