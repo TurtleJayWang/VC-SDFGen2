@@ -76,9 +76,9 @@ class BaseTrainer:
             self.models[i] = model.to(self.device)
             self.models[i].train()
     
-        self.start_epoch = self.get_latest_epoch()
+        self.start_epoch = self.get_latest_epoch() + 1
         if self.start_epoch > 0:
-            self.load_models(self.start_epoch)
+            self.load_models(self.start_epoch - 1)
     
     def save_models(self, epoch):
         for i, model in enumerate(self.models):
@@ -90,7 +90,8 @@ class BaseTrainer:
     
     def load_loss(self):
         if os.path.exists(os.path.join(self.result_dir, self.loss_file_name)):
-            losses = np.load(os.path.join(self.result_dir, self.loss_file_name)).tolist()
+            self.losses = np.load(os.path.join(self.result_dir, self.loss_file_name)).tolist()
+            self.losses = self.losses[:self.get_latest_epoch()]
         else:
             self.losses = []
     
