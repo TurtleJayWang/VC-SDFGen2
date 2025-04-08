@@ -79,7 +79,6 @@ class BaseTrainer:
         self.start_epoch = self.get_latest_epoch()
         if self.start_epoch > 0:
             self.load_models(self.start_epoch)
-        self.start_epoch += 1
     
     def save_models(self, epoch):
         for i, model in enumerate(self.models):
