@@ -1,5 +1,5 @@
 from model.VCCNF import VCCNF
-from data.dataset import ShapeNetVoxel64
+from data.dataset import ShapeNetVoxel32
 from trainer.BaseTrainer import BaseTrainer
 
 import torch
