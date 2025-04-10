@@ -24,7 +24,7 @@ shapenetsdf_path = kagglehub.dataset_download("turtlejaywang/shapenetsdf")
 shapenetvoxel32_path = kagglehub.dataset_download("turtlejaywang/shapenetvoxel64")
 
 def train_deepsdf(writer : SummaryWriter):
-    deepsdf_model = DeepSDF(latent_dim=256, hidden_dim=512, n_hidden_layers=8)
+    deepsdf_model = DeepSDF(latent_dim=512, hidden_dim=512, n_hidden_layers=8)
     deepsdf_dataset = ShapeNetSDF(shapenetsdf_path)
 
     deepsdf_model_infos = {
@@ -38,12 +38,12 @@ def train_deepsdf(writer : SummaryWriter):
         deepsdf_model_infos,
         deepsdf_dataset,
         epochs=2000, batch_size=28,
-        results_dir="results/results_deepsdf_latent256_hidden512_dropout02_v1",
+        results_dir="results/results_deepsdf_latent512_hidden512_dropout02_v1",
         model_save_frequency=100
     )
 
-    for e, losses in tqdm(deepsdf_trainer, total=deepsdf_trainer.epochs - deepsdf_trainer.get_latest_epoch()):
-        writer.add_scalar("Loss/DeepSDF_train", losses[-1], e)
+    for e, losses in tqdm(deepsdf_trainer):
+        writer.add_scalars("Loss/DeepSDF_train", losses[-1], e)
         writer.flush()
         
     return deepsdf_trainer
