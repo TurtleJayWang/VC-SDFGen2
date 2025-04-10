@@ -46,7 +46,7 @@ class DeepSDF(nn.Module):
         # Pass through the hidden layers
         for i, layer in enumerate(self.hidden_layers):
             if i in self.skip_layers:
-                x = torch.cat([x, latent_code, points], dim=-1)
+                x = torch.cat([latent_code, points, x], dim=-1)
             x = layer(x)
             x = self.dropout(x)
 

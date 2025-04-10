@@ -92,8 +92,8 @@ class BaseTrainer:
             model.load_state_dict(torch.load(os.path.join(self.result_dir, f"{self.model_file_names[i]}_epoch_{epoch}.pth")))
     
     def load_loss(self):
-        if os.path.exists(os.path.join(self.result_dir, self.loss_file_name)):
-            self.losses = np.load(os.path.join(self.result_dir, self.loss_file_name)).tolist()
+        if os.path.exists(os.path.join(self.result_dir, self.loss_file_name) + ".npy"):
+            self.losses = np.load(os.path.join(self.result_dir, self.loss_file_name) + ".npy").tolist()
             self.losses = self.losses[:self.get_latest_epoch()]
         else:
             self.losses = []
@@ -102,8 +102,8 @@ class BaseTrainer:
         np.save(os.path.join(self.result_dir, self.loss_file_name), np.array(self.losses))
     
     def get_latest_epoch(self):
-        if os.path.exists(os.path.join(self.result_dir, self.loss_file_name)):
-            losses = np.load(os.path.join(self.result_dir, self.loss_file_name)).tolist()
+        if os.path.exists(os.path.join(self.result_dir, self.loss_file_name) + ".npy"):
+            losses = np.load(os.path.join(self.result_dir, self.loss_file_name) + ".npy").tolist()
             if losses:
                 latest_epoch = len(losses) // self.model_save_frequency * self.model_save_frequency
                 is_true_latest = True

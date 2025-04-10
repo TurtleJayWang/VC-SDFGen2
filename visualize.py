@@ -12,7 +12,6 @@ from model.VoxelSDF import VoxelSDF
 class Visualizer:
     def __init__(self, sdf_decoder : VoxelSDF, latent_vecs : nn.Embedding):
         self.sdf_decoder = sdf_decoder
-        self.latent_grid_size = self.sdf_decoder.voxel_grid_size
         self.latent_dim = self.sdf_decoder.latent_dim
 
         self.latent_vecs = latent_vecs
@@ -34,7 +33,7 @@ class Visualizer:
         # Split the points into 4 seperate splits to prevent running out of memory
         points_splits = points.split(250000)
 
-        latent_code = self.latent_vecs(torch.tensor([embedding_index]))
+        latent_code = self.latent_vecs(torch.tensor([embedding_index]).to(self.device))
         latent_code = latent_code.to(self.device)
 
         sdfs = torch.zeros(0, device="cpu")
