@@ -72,6 +72,9 @@ class BaseTrainer:
     def set_optimizer(self, model_lr : dict):
         pass
     
+    def save_optimizer(self):
+        pass
+    
     def pre_train(self):
         self.load_loss()
     
