@@ -45,16 +45,12 @@ class DeepSDFTrainer(BaseTrainer):
         
         start_epoch = self.get_latest_epoch()
         if start_epoch > 0:
-            with open(os.path.join(self.result_dir, f"optimizer_deepsdf_embedding.pth")) as f:
-                self.optimizer = torch.load(f)
-            with open(os.path.join(self.result_dir, f"scheduler_deepsdf_embedding.pth")) as f:
-                self.scheduler = torch.load(f)
+            self.optimizer.load_state_dict(torch.load(os.path.join(self.result_dir, "optimizer_deepsdf_embedding.pth"), weights_only=True))
+            self.scheduler.load_state_dict(torch.load(os.path.join(self.result_dir, "scheduler_deepsdf_embedding.pth"), weights_only=True))
         
     def save_optimizer(self):
-        with open(os.path.join(self.result_dir, f"optimizer_deepsdf_embedding.pth"), "wb") as f:
-            torch.save(self.optimizer.state_dict(), f)
-        with open(os.path.join(self.result_dir, f"scheduler_deepsdf_embedding.pth"), "wb") as f:
-            torch.save(self.scheduler.state_dict(), f)
+        torch.save(self.optimizer.state_dict(), os.path.join(self.result_dir, "optimizer_deepsdf_embedding.pth"))
+        torch.save(self.scheduler.state_dict(), os.path.join(self.result_dir, "scheduler_deepsdf_embedding.pth"))
         
     def epoch_train(self, epoch):
         self.deepsdf_model.train()

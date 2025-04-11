@@ -14,8 +14,6 @@ from model.VCCNF import VCCNF
 from visualize import Visualizer
 import random
 
-import pdb
-
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 
@@ -37,7 +35,7 @@ def train_deepsdf(writer : SummaryWriter):
     deepsdf_trainer = DeepSDFTrainer(
         deepsdf_model_infos,
         deepsdf_dataset,
-        epochs=2000, batch_size=28,
+        epochs=2000, batch_size=24,
         results_dir="results/results_deepsdf_latent512_hidden512_dropout02_v1",
         model_save_frequency=100
     )

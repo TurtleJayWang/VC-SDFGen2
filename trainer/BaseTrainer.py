@@ -9,6 +9,20 @@ from math import sqrt
 
 class BaseTrainer:
     def __init__(self, model_infos : dict, datasets, epochs, batch_size, result_dir, loss_file_name, model_save_frequency=100):
+        seed = 42
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch.cuda.is_available():
+            print(f"Using GPU: {torch.cuda.get_device_name(0)}")
+        else:
+            print("Using CPU")
+        
         self.model_infos = model_infos
         self.epochs = epochs
         self.batch_size = batch_size
@@ -20,6 +34,10 @@ class BaseTrainer:
         self.models = []
         for model_name, model_info in self.model_infos.items():
             self.models.append(model_info["model"])
+
+        for i, model in enumerate(self.models):
+            self.models[i] = model.to(self.device)
+            self.models[i].train()
         
         self.loss_file_name = loss_file_name
         self.result_dir = result_dir
@@ -37,12 +55,10 @@ class BaseTrainer:
                 "lr" : lr
             }
         self.set_optimizer(model_lr)
-        
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        if torch.cuda.is_available():
-            print(f"Using GPU: {torch.cuda.get_device_name(0)}")
-        else:
-            print("Using CPU")
+            
+    def __del__(self):
+        torch.backends.cudnn.deterministic = False
+        torch.backends.cudnn.benchmark = True
             
     def __len__(self):
         return self.epochs - self.get_latest_epoch()
@@ -82,10 +98,6 @@ class BaseTrainer:
         self.start_epoch = self.get_latest_epoch()
         if self.start_epoch > 0:
             self.load_models(self.start_epoch)
-            
-        for i, model in enumerate(self.models):
-            self.models[i] = model.to(self.device)
-            self.models[i].train()
     
     def save_models(self, epoch):
         for i, model in enumerate(self.models):
@@ -93,7 +105,7 @@ class BaseTrainer:
             
     def load_models(self, epoch):
         for i, model in enumerate(self.models):
-            model.load_state_dict(torch.load(os.path.join(self.result_dir, f"{self.model_file_names[i]}_epoch_{epoch}.pth")))
+            model.load_state_dict(torch.load(os.path.join(self.result_dir, f"{self.model_file_names[i]}_epoch_{epoch}.pth"), weights_only=True))
     
     def load_loss(self):
         if os.path.exists(os.path.join(self.result_dir, self.loss_file_name) + ".npy"):
