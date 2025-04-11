@@ -48,7 +48,7 @@ def train_deepsdf(writer : SummaryWriter):
         
     return deepsdf_trainer
         
-def train_vccnf(writer : SummaryWriter, embedding):
+def train_vccnf(writer : SummaryWriter, embeddings):
     vccnf_model = VCCNF(latent_dim=512, hidden_dim=512, voxel_grid_size=32, voxel_latent_dim=512)
     shapenetvoxel32 = ShapeNetVoxel32(shapenetvoxel32_path)
 
@@ -64,16 +64,17 @@ def train_vccnf(writer : SummaryWriter, embedding):
         shapenetvoxel32,
         epochs=2000, batch_size=24, 
         results_dir="results/results_vccnf",
-        embedding=embedding
+        embeddings=embeddings
     )
 
-    for e, losses in tqdm(enumerate(vccnf_trainer), total=vccnf_trainer.epochs):
+    for e, losses in tqdm(enumerate(vccnf_trainer)):
         writer.add_scalar("Loss/VCCNF_train", losses[-1], e)
         writer.flush()
         
 if __name__ == "__main__":
     is_train_deepsdf = True
     is_train_vccnf = True
+    is_visualize = False
     
     writer = SummaryWriter()
     
@@ -81,9 +82,10 @@ if __name__ == "__main__":
     embeddings = deepsdf_trainer.embeddings
     deepsdf_model = deepsdf_trainer.deepsdf_model
     
-    visualizer = Visualizer(deepsdf_model, embeddings)
-    for i in range(0, 10):
-        visualizer.generate_sdf_objs("results/model_recontruct/phase1", i)
+    if is_visualize:
+        visualizer = Visualizer(deepsdf_model, embeddings)
+        for i in range(0, 10):
+            visualizer.generate_sdf_objs("results/model_recontruct/phase1", i)
 
     if is_train_vccnf:
         train_vccnf(writer, embeddings)

@@ -6,6 +6,7 @@ import numpy as np
 import random
 import trimesh
 from skimage import measure
+import os
 
 from model.VoxelSDF import VoxelSDF
 
@@ -45,7 +46,7 @@ class Visualizer:
         sdfs = sdfs.numpy()
         return sdfs
 
-    def generate_sdf_objs(self, index):
+    def generate_sdf_objs(self, path, index):
         self.sdf_decoder.eval()
         with torch.no_grad():
             # Get the sdf values from model
@@ -58,5 +59,8 @@ class Visualizer:
             
             # Output the result into mesh
             mesh = trimesh.Trimesh(vertices=verts, faces=faces, face_normals=normals)
-            with open(f"mesh_reconstruct_model_{index}.obj", "w") as f:
+            
+            if not os.path.exists(path):
+                os.makedirs(path)
+            with open(os.path.join(path, f"mesh_reconstruct_model_{index}.obj"), "w") as f:
                 mesh.export(f, "obj")

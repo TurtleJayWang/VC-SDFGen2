@@ -26,6 +26,9 @@ class VCCNFTrainer(BaseTrainer):
         )
 
         self.embeddings = embeddings
+        self.vccnf_model = vccnf_model_info["vccnf"]["model"]
+        self.embeddings = self.embeddings.to(self.device)
+        self.vccnf_model = self.vccnf_model.to(self.device)
         
         self.loss_fn = nn.MSELoss()
         
@@ -42,8 +45,7 @@ class VCCNFTrainer(BaseTrainer):
         )
         
     def set_optimizer(self, model_lr):
-        print(model_lr)
-        self.optimizer = torch.optim.Adam(model_lr, lr=1e-3)
+        self.optimizer = torch.optim.Adam(list(model_lr.values()), lr=1e-3)
         self.scheduler = StepLR(self.optimizer, step_size=100, gamma=0.5)
         
         if self.get_latest_epoch() > 0:
@@ -56,7 +58,7 @@ class VCCNFTrainer(BaseTrainer):
         
     def epoch_train(self, epoch):
         epoch_loss = 0
-        self.model.train()
+        self.vccnf_model.train()
         for i, (voxel_data, indices) in enumerate(self.shapenetvoxel64_loader_training):
             indices = indices.to(self.device)
             latent_codes = self.embeddings(indices)
@@ -65,8 +67,10 @@ class VCCNFTrainer(BaseTrainer):
             gaussian_latents = torch.randn_like(latent_codes)
             gaussian_latents = gaussian_latents.to(self.device)
             
-            latent_pred = self.model(voxel_data, gaussian_latents)
-
+            voxel_data = voxel_data.to(self.device)
+            
+            latent_pred = self.vccnf_model(voxel_data, gaussian_latents)
+            
             loss = self.loss_fn(latent_pred, latent_codes)
             self.optimizer.zero_grad()
             loss.backward()

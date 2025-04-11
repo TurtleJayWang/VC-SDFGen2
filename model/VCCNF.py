@@ -60,7 +60,8 @@ class ODEFunc(nn.Module):
     
     def forward(self, t, latent, voxel_latent):
         # Concatenate the latent code and voxel latent
-        x = torch.cat([latent, voxel_latent, t], dim=-1)
+        batch_size = latent.size(0)
+        x = torch.cat([latent, voxel_latent, t.unsqueeze(0).repeat(batch_size).unsqueeze(1)], dim=-1)
         
         # Pass through the input layer
         x = self.input_layer(x)
@@ -69,7 +70,7 @@ class ODEFunc(nn.Module):
         # Pass through the hidden layers
         for i, layer in enumerate(self.hidden_layers):
             if i % self.skip_frequency == 1:
-                x = torch.cat([x, voxel_latent, t], dim=-1)
+                x = torch.cat([x, voxel_latent, t.unsqueeze(0).repeat(batch_size).unsqueeze(1)], dim=-1)
             x = layer(x)
 
         # Pass through the output layer
@@ -89,7 +90,7 @@ class VCCNF(nn.Module):
         # Define the ODE function
         self.ode_func = ODEFunc(latent_dim, voxel_latent_dim, n_layers=n_layers, hidden_dim=hidden_dim, skip_frequency=skip_frequency)
         
-        self.integrated_time = torch.tensor([0, 1])  # Time points for integration
+        self.integrated_time = torch.tensor([0, 1]).float()  # Time points for integration
         
     def forward(self, voxel_grid, latent_code):
         # Encode the voxel grid
