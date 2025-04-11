@@ -59,6 +59,7 @@ class BaseTrainer:
             if epoch % self.model_save_frequency == 0:
                 self.save_models(epoch)
                 self.save_loss()
+                self.save_optimizer()
                 
             yield epoch, self.losses
         
