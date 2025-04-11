@@ -38,18 +38,18 @@ class DeepSDFTrainer(BaseTrainer):
         self.deepsdf_dataset = datasets[0]
         self.deepsdf_train_dataloader = DataLoader(self.deepsdf_dataset, batch_size=self.batch_size, shuffle=True)
         
-    def set_optimizer(self, model_lr : dict):
+    def set_optimizer(self, model_lr : dict):    
+        self.optimizer = torch.optim.Adam(list(model_lr.values()))
+        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=500, gamma=0.5)
+        self.scheduler.last_epoch = self.get_latest_epoch() - 1
+        
         start_epoch = self.get_latest_epoch()
         if start_epoch > 0:
             with open(os.path.join(self.result_dir, f"optimizer_deepsdf_embedding.pth")) as f:
                 self.optimizer = torch.load(f)
             with open(os.path.join(self.result_dir, f"scheduler_deepsdf_embedding.pth")) as f:
                 self.scheduler = torch.load(f)
-        else:        
-            self.optimizer = torch.optim.Adam(list(model_lr.values()))
-            self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=500, gamma=0.5)
-            self.scheduler.last_epoch = self.get_latest_epoch() - 1
-            
+        
     def save_optimizer(self):
         with open(os.path.join(self.result_dir, f"optimizer_deepsdf_embedding.pth")) as f:
             torch.save(self.optimizer.state_dict(), f)

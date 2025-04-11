@@ -46,6 +46,16 @@ class VCCNFTrainer(BaseTrainer):
         self.optimizer = torch.optim.Adam(parameters, lr=1e-3)
         self.scheduler = StepLR(self.optimizer, step_size=100, gamma=0.5)
         
+        if self.get_latest_epoch() > 0:
+            self.optimizer.load_state_dict(torch.load(os.path.join(self.result_dir, "optimizer_vccnf.pth")))
+            self.scheduler.load_state_dict(torch.load(os.path.join(self.result_dir, "scheduler_vccnf.pth")))
+        
+    def save_optimizer(self):
+        with open(os.path.join(self.result_dir, "optimizer_vccnf.pth")) as f:
+            torch.save(self.optimizer, f)
+        with open(os.path.join(self.result_dir, "scheduler_vccnf.pth")) as f:
+            torch.save(self.scheduler, f)
+        
     def epoch_train(self, epoch):
         epoch_loss = 0
         self.model.train()
