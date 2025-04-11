@@ -67,7 +67,7 @@ def train_vccnf(writer : SummaryWriter, embeddings):
         embeddings=embeddings
     )
 
-    for e, losses in tqdm(enumerate(vccnf_trainer)):
+    for e, losses in tqdm(vccnf_trainer):
         writer.add_scalar("Loss/VCCNF_train", losses[-1], e)
         writer.flush()
         
