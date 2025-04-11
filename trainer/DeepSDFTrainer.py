@@ -51,9 +51,9 @@ class DeepSDFTrainer(BaseTrainer):
                 self.scheduler = torch.load(f)
         
     def save_optimizer(self):
-        with open(os.path.join(self.result_dir, f"optimizer_deepsdf_embedding.pth")) as f:
+        with open(os.path.join(self.result_dir, f"optimizer_deepsdf_embedding.pth"), "wb") as f:
             torch.save(self.optimizer.state_dict(), f)
-        with open(os.path.join(self.result_dir, f"scheduler_deepsdf_embedding.pth")) as f:
+        with open(os.path.join(self.result_dir, f"scheduler_deepsdf_embedding.pth"), "wb") as f:
             torch.save(self.scheduler.state_dict(), f)
         
     def epoch_train(self, epoch):
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     deepsdf_dataset = ShapeNetSDF(shapenetsdf_path)
     
     trainer = DeepSDFTrainer(
-        deepsdf_model, 
+        deepsdf_model,
         deepsdf_dataset, 
         epochs=2000, batch_size=24, 
         results_dir="results_deepsdf_latent512_hidden512"

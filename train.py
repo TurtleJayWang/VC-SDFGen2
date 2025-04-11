@@ -43,7 +43,7 @@ def train_deepsdf(writer : SummaryWriter):
     )
 
     for e, losses in tqdm(deepsdf_trainer):
-        writer.add_scalars("Loss/DeepSDF_train", losses[-1], e)
+        writer.add_scalar("Loss/DeepSDF_train", losses[-1], e)
         writer.flush()
         
     return deepsdf_trainer
@@ -73,7 +73,7 @@ def train_vccnf(writer : SummaryWriter, embedding):
         
 if __name__ == "__main__":
     is_train_deepsdf = True
-    is_train_vccnf = False
+    is_train_vccnf = True
     
     writer = SummaryWriter()
     
