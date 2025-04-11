@@ -56,10 +56,6 @@ class BaseTrainer:
             }
         self.set_optimizer(model_lr)
             
-    def __del__(self):
-        torch.backends.cudnn.deterministic = False
-        torch.backends.cudnn.benchmark = True
-            
     def __len__(self):
         return self.epochs - self.get_latest_epoch()
         

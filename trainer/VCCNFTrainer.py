@@ -13,26 +13,25 @@ from math import sqrt
 from torch.optim.lr_scheduler import StepLR
 
 class VCCNFTrainer(BaseTrainer):
-    def __init__(self, vccnf_model, dataset, result_dir, epochs, batch_size, embedding):
+    def __init__(self, vccnf_model_info, dataset, results_dir, epochs, batch_size, embeddings):
         self.epochs = epochs
         self.batch_size = batch_size
         
         super().__init__(
-            [vccnf_model], [dataset], 
+            vccnf_model_info, [dataset], 
             epochs, batch_size,
-            result_dir,
-            "losses_vccnf_train", ["vccnf_model"], 
-            model_save_frequency=100
+            results_dir,
+            "losses_vccnf_train",
+            100
         )
 
-        self.latent_dim = self.model.latent_dim
-        self.embeddings = embedding
+        self.embeddings = embeddings
         
         self.loss_fn = nn.MSELoss()
         
     def load_datasets(self, datasets):
         self.shapenetvoxel64_dataset_splits = random_split(
-            self.datasets[0], 
+            datasets[0], 
             [0.8, 0.2], 
             generator=torch.Generator().manual_seed(42)
         )
@@ -42,19 +41,18 @@ class VCCNFTrainer(BaseTrainer):
             shuffle=True
         )
         
-    def set_optimizer(self, parameters):
-        self.optimizer = torch.optim.Adam(parameters, lr=1e-3)
+    def set_optimizer(self, model_lr):
+        print(model_lr)
+        self.optimizer = torch.optim.Adam(model_lr, lr=1e-3)
         self.scheduler = StepLR(self.optimizer, step_size=100, gamma=0.5)
         
         if self.get_latest_epoch() > 0:
-            self.optimizer.load_state_dict(torch.load(os.path.join(self.result_dir, "optimizer_vccnf.pth")))
-            self.scheduler.load_state_dict(torch.load(os.path.join(self.result_dir, "scheduler_vccnf.pth")))
+            self.optimizer.load_state_dict(torch.load(os.path.join(self.result_dir, "optimizer_vccnf.pth"), weights_only=True))
+            self.scheduler.load_state_dict(torch.load(os.path.join(self.result_dir, "scheduler_vccnf.pth"), weights_only=True))
         
     def save_optimizer(self):
-        with open(os.path.join(self.result_dir, "optimizer_vccnf.pth")) as f:
-            torch.save(self.optimizer, f)
-        with open(os.path.join(self.result_dir, "scheduler_vccnf.pth")) as f:
-            torch.save(self.scheduler, f)
+        torch.save(self.optimizer, os.path.join(self.result_dir, "optimizer_vccnf.pth"))
+        torch.save(self.scheduler, os.path.join(self.result_dir, "scheduler_vccnf.pth"))
         
     def epoch_train(self, epoch):
         epoch_loss = 0

@@ -14,6 +14,8 @@ from model.VCCNF import VCCNF
 from visualize import Visualizer
 import random
 
+import torch
+
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter()
 
@@ -47,7 +49,7 @@ def train_deepsdf(writer : SummaryWriter):
     return deepsdf_trainer
         
 def train_vccnf(writer : SummaryWriter, embedding):
-    vccnf_model = VCCNF(latent_dim=512, hidden_dim=512, n_hidden_layers=8)
+    vccnf_model = VCCNF(latent_dim=512, hidden_dim=512, voxel_grid_size=32, voxel_latent_dim=512)
     shapenetvoxel32 = ShapeNetVoxel32(shapenetvoxel32_path)
 
     vccnf_model_info = {
@@ -80,7 +82,8 @@ if __name__ == "__main__":
     deepsdf_model = deepsdf_trainer.deepsdf_model
     
     visualizer = Visualizer(deepsdf_model, embeddings)
-    visualizer.generate_sdf_objs(random.randint(0, len(deepsdf_trainer.deepsdf_dataset)))
+    for i in range(0, 10):
+        visualizer.generate_sdf_objs("results/model_recontruct/phase1", i)
 
     if is_train_vccnf:
         train_vccnf(writer, embeddings)
