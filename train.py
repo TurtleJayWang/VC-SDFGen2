@@ -30,7 +30,7 @@ def train_deepsdf(writer : SummaryWriter):
     deepsdf_model_infos = {
         "deepsdf" : {
             "model" : deepsdf_model,
-            "init_lr" : 1e-3
+            "init_lr" : 5e-4
         }
     }
 
