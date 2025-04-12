@@ -53,8 +53,8 @@ class VCCNFTrainer(BaseTrainer):
             self.scheduler.load_state_dict(torch.load(os.path.join(self.result_dir, "scheduler_vccnf.pth"), weights_only=True))
         
     def save_optimizer(self):
-        torch.save(self.optimizer, os.path.join(self.result_dir, "optimizer_vccnf.pth"))
-        torch.save(self.scheduler, os.path.join(self.result_dir, "scheduler_vccnf.pth"))
+        torch.save(self.optimizer.state_dict(), os.path.join(self.result_dir, "optimizer_vccnf.pth"))
+        torch.save(self.scheduler.state_dict(), os.path.join(self.result_dir, "scheduler_vccnf.pth"))
         
     def epoch_train(self, epoch):
         epoch_loss = 0
