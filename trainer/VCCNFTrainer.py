@@ -79,3 +79,4 @@ class VCCNFTrainer(BaseTrainer):
             epoch_loss += loss.item() 
         self.scheduler.step()
         self.losses.append(epoch_loss)
+        return epoch_loss

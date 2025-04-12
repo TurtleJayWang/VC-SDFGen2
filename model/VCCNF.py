@@ -78,7 +78,7 @@ class ODEFunc(nn.Module):
         return output
 
 class VCCNF(nn.Module):
-    def __init__(self, latent_dim, voxel_grid_size, voxel_latent_dim, n_layers=4, hidden_dim=512, skip_frequency=2):
+    def __init__(self, latent_dim, voxel_grid_size, voxel_latent_dim, n_layers=4, hidden_dim=512, skip_frequency=2, device="cuda"):
         super(VCCNF, self).__init__()
         self.latent_dim = latent_dim
         self.voxel_grid_size = voxel_grid_size
@@ -90,7 +90,7 @@ class VCCNF(nn.Module):
         # Define the ODE function
         self.ode_func = ODEFunc(latent_dim, voxel_latent_dim, n_layers=n_layers, hidden_dim=hidden_dim, skip_frequency=skip_frequency)
         
-        self.integrated_time = torch.tensor([0, 1]).float()  # Time points for integration
+        self.integrated_time = torch.tensor([0, 1]).float().to(device)  # Time points for integration
         
     def forward(self, voxel_grid, latent_code):
         # Encode the voxel grid
@@ -102,6 +102,6 @@ class VCCNF(nn.Module):
             return self.ode_func(t, latent_code, voxel_latent)
         
         # Integrate the ODE
-        latent_code = odeint(odeint_func, latent_code, self.integrated_time, method="rk4")
+        latent_code = odeint(odeint_func, latent_code, self.integrated_time, method="rk4")[-1]
         
         return latent_code
