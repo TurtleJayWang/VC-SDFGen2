@@ -26,20 +26,25 @@ class DeepSDFTrainer(BaseTrainer):
             "init_lr" : 1e-3
         }
         
+        self.deepsdf_dataset = deepsdf_dataset
+        
         super().__init__(
-            deepsdf_model_infos, [deepsdf_dataset], 
+            deepsdf_model_infos, 
             epochs, batch_size,
             results_dir,
             "losses_deepsdf_train", 
             model_save_frequency
         )
     
-    def load_datasets(self, datasets):
-        self.deepsdf_dataset = datasets[0]
+    def load_datasets(self):
         self.deepsdf_train_dataloader = DataLoader(self.deepsdf_dataset, batch_size=self.batch_size, shuffle=True)
         
-    def set_optimizer(self, model_lr : dict):    
-        self.optimizer = torch.optim.Adam(list(model_lr.values()))
+    def set_optimizer(self):
+        model_lr = [
+            { "params" : self.deepsdf_model.parameters(), "lr" : 5e-4 },
+            { "params" : self.embeddings.parameters(), "lr" : 1e-3 }
+        ]    
+        self.optimizer = torch.optim.Adam(model_lr)
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=500, gamma=0.5)
         self.scheduler.last_epoch = self.get_latest_epoch() - 1
         

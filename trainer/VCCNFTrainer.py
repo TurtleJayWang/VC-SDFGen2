@@ -17,24 +17,24 @@ class VCCNFTrainer(BaseTrainer):
         self.epochs = epochs
         self.batch_size = batch_size
         
+        self.embeddings = embeddings
+        self.vccnf_model : VCCNF = vccnf_model_info["vccnf"]["model"]
+        
+        self.shapenetvoxel32_dataset = dataset
+        
         super().__init__(
-            vccnf_model_info, [dataset], 
+            vccnf_model_info, 
             epochs, batch_size,
             results_dir,
             "losses_vccnf_train",
             100
         )
-
-        self.embeddings = embeddings
-        self.vccnf_model = vccnf_model_info["vccnf"]["model"]
-        self.embeddings = self.embeddings.to(self.device)
-        self.vccnf_model = self.vccnf_model.to(self.device)
         
         self.loss_fn = nn.MSELoss()
         
-    def load_datasets(self, datasets):
+    def load_datasets(self):
         self.shapenetvoxel64_dataset_splits = random_split(
-            datasets[0], 
+            self.shapenetvoxel32_dataset, 
             [0.8, 0.2], 
             generator=torch.Generator().manual_seed(42)
         )
@@ -44,9 +44,13 @@ class VCCNFTrainer(BaseTrainer):
             shuffle=True
         )
         
-    def set_optimizer(self, model_lr):
-        self.optimizer = torch.optim.Adam(list(model_lr.values()), lr=1e-3)
-        self.scheduler = StepLR(self.optimizer, step_size=100, gamma=0.5)
+    def set_optimizer(self):
+        model_lr = [{
+            "params" : self.vccnf_model.parameters(),
+            "lr" : 1e-3
+        }]
+        self.optimizer = torch.optim.Adam(model_lr, lr=1e-3)
+        self.scheduler = StepLR(self.optimizer, step_size=500, gamma=0.5)
         
         if self.get_latest_epoch() > 0:
             self.optimizer.load_state_dict(torch.load(os.path.join(self.result_dir, "optimizer_vccnf.pth"), weights_only=True))
@@ -64,7 +68,10 @@ class VCCNFTrainer(BaseTrainer):
             latent_codes = self.embeddings(indices)
             latent_codes = latent_codes.to(self.device)
             
-            gaussian_latents = torch.randn_like(latent_codes)
+            mean = 0.0
+            std = 1 / sqrt(latent_codes.size(-1))
+            
+            gaussian_latents = torch.randn_like(latent_codes) * std + mean
             gaussian_latents = gaussian_latents.to(self.device)
             
             voxel_data = voxel_data.to(self.device)

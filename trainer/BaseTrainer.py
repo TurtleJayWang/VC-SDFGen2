@@ -8,7 +8,7 @@ import random
 from math import sqrt
 
 class BaseTrainer:
-    def __init__(self, model_infos : dict, datasets, epochs, batch_size, result_dir, loss_file_name, model_save_frequency=100):
+    def __init__(self, model_infos : dict, epochs, batch_size, result_dir, loss_file_name, model_save_frequency=100):
         seed = 42
         random.seed(seed)
         np.random.seed(seed)
@@ -44,17 +44,9 @@ class BaseTrainer:
         
         self.model_save_frequency = model_save_frequency
         
-        self.load_datasets(datasets)
+        self.load_datasets()
         
-        model_lr = {}
-        for model_name, model_info in self.model_infos.items():
-            model = model_info["model"]
-            lr = model_info["init_lr"]
-            model_lr[model_name] = {
-                "params" : model.parameters(),
-                "lr" : lr
-            }
-        self.set_optimizer(model_lr)
+        self.set_optimizer()
             
     def __len__(self):
         return self.epochs - self.get_latest_epoch()
@@ -82,7 +74,7 @@ class BaseTrainer:
     def load_datasets(self, datasets):
         pass
         
-    def set_optimizer(self, model_lr : dict):
+    def set_optimizer(self):
         pass
     
     def save_optimizer(self):

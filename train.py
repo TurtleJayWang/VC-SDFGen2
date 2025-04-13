@@ -71,6 +71,8 @@ def train_vccnf(writer : SummaryWriter, embeddings):
         writer.add_scalar("Loss/VCCNF_train", losses[-1], e)
         writer.flush()
         
+    return vccnf_trainer
+        
 if __name__ == "__main__":
     is_train_deepsdf = True
     is_train_vccnf = True
@@ -87,7 +89,8 @@ if __name__ == "__main__":
         for i in range(0, 10):
             visualizer.generate_sdf_objs("results/model_recontruct/phase1", i)
 
+    vccnf_trainer = None
     if is_train_vccnf:
-        train_vccnf(writer, embeddings)
+        vccnf_trainer = train_vccnf(writer, embeddings)
     
     writer.close()
