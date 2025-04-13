@@ -99,7 +99,7 @@ class FullTrainer(BaseTrainer):
             latent_codes = self.vccnf_model(voxels, gaussian_latents)
             sdf_preds = self.deepsdf_model(latent_codes, points)
             
-            loss = F.l1_loss(sdf_preds, sdfs, reduction="sum")
+            loss = F.l1_loss(sdf_preds.view(-1), sdfs.view(-1), reduction="sum")
             
             self.deepsdf_optimizer.zero_grad()
             self.vccnf_optimizer.zero_grad()

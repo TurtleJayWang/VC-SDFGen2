@@ -85,20 +85,20 @@ if __name__ == "__main__":
     deepsdf_trainer = train_deepsdf(writer)
     embeddings = deepsdf_trainer.embeddings
     deepsdf_model = deepsdf_trainer.deepsdf_model
-    
-    if is_visualize:
-        visualizer = Visualizer(deepsdf_model, embeddings)
-        for i in range(0, 10):
-            visualizer.generate_sdf_objs("results/model_recontruct/phase1", i)
 
     vccnf_trainer = None
     if is_train_vccnf:
         vccnf_trainer = train_vccnf(writer, embeddings)
     
-    full_trainer = FullTrainer(deepsdf_trainer, vccnf_trainer, 2000, 2, "results/results_full_v1")
+    full_trainer = FullTrainer(deepsdf_trainer, vccnf_trainer, 2000, 4, "results/results_full_v1")
     
     for e, losses in tqdm(full_trainer):
         writer.add_scalar("Loss/Full_train", losses[-1], e)
         writer.flush()
+
+    visualizer = Visualizer(full_trainer.vccnf_model, full_trainer.deepsdf_model, embeddings)
+    for i in range(0, 5):
+        visualizer.generate_sdf_objs("results/model_recontruct/phase1", i)
+        visualizer.generate_sdf_objs_with_full_network(f"results/model_trecontruct/phase3/mesh_reconstruct_{i}.obj", full_trainer.full_dataset[i][0])
     
     writer.close()

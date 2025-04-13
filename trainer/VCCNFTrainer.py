@@ -26,7 +26,7 @@ class VCCNFTrainer(BaseTrainer):
             vccnf_model_info, 
             epochs, batch_size,
             results_dir,
-            "losses_vccnf_train",
+            "losses_vccnf_train.npy",
             100
         )
         

@@ -32,7 +32,7 @@ class DeepSDFTrainer(BaseTrainer):
             deepsdf_model_infos, 
             epochs, batch_size,
             results_dir,
-            "losses_deepsdf_train", 
+            "losses_deepsdf_train.npy", 
             model_save_frequency
         )
     
