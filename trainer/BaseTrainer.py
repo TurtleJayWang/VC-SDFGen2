@@ -28,7 +28,7 @@ class BaseTrainer:
         self.batch_size = batch_size
         
         if not os.path.exists(result_dir):
-            os.mkdir(result_dir)
+            os.makedirs(result_dir)
         
         self.model_file_names = list(self.model_infos.keys())
         self.models = []
@@ -71,7 +71,7 @@ class BaseTrainer:
         """In epoch train, we will train the model for one epoch. All you need to do is manage the tensor dimensions and the data loader."""
         pass
     
-    def load_datasets(self, datasets):
+    def load_datasets(self):
         pass
         
     def set_optimizer(self):

@@ -11,6 +11,8 @@ from trainer.VCCNFTrainer import VCCNFTrainer
 from data.dataset import ShapeNetVoxel32
 from model.VCCNF import VCCNF
 
+from trainer.FullTrainer import FullTrainer
+
 from visualize import Visualizer
 import random
 
@@ -92,5 +94,11 @@ if __name__ == "__main__":
     vccnf_trainer = None
     if is_train_vccnf:
         vccnf_trainer = train_vccnf(writer, embeddings)
+    
+    full_trainer = FullTrainer(deepsdf_trainer, vccnf_trainer, 2000, 2, "results/results_full_v1")
+    
+    for e, losses in tqdm(full_trainer):
+        writer.add_scalar("Loss/Full_train", losses[-1], e)
+        writer.flush()
     
     writer.close()

@@ -22,12 +22,12 @@ class FullDataset(Dataset):
         return len(self.shapenetsdf)
     
     def __getitem__(self, index):
-        points, sdfs = self.shapenetsdf[index]
-        voxel_data = self.shapenetvoxel32[index]
+        points, sdfs, i = self.shapenetsdf[index]
+        voxel_data, i = self.shapenetvoxel32[index]
         return voxel_data, points, sdfs
 
 class FullTrainer(BaseTrainer):
-    def __init__(self, deepsdf_trainer : DeepSDFTrainer, vccnf_trainer : VCCNFTrainer, result_dir):
+    def __init__(self, deepsdf_trainer : DeepSDFTrainer, vccnf_trainer : VCCNFTrainer, epochs, batch_size, result_dir):
         self.latent_dim = deepsdf_trainer.latent_dim
         
         self.deepsdf_model = deepsdf_trainer.deepsdf_model
@@ -54,10 +54,10 @@ class FullTrainer(BaseTrainer):
             self.model_infos,
             2000, 24,
             result_dir,
-            "loss_full.npz"
+            "loss_full.npy"
         )
         
-    def set_dataset(self):
+    def load_datasets(self):
         self.full_dataset = FullDataset(self.shapenetsdf, self.shapenetvoxel32)
         self.training_dataset, _ = random_split(self.full_dataset, [0.8, 0.2], torch.Generator().manual_seed(42))
         self.training_loader = DataLoader(self.training_dataset, self.batch_size, True)
