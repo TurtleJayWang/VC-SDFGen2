@@ -97,8 +97,8 @@ if __name__ == "__main__":
         writer.flush()
 
     visualizer = Visualizer(full_trainer.vccnf_model, full_trainer.deepsdf_model, embeddings)
-    for i in range(0, 5):
-        visualizer.generate_sdf_objs("results/model_recontruct/phase1", i)
-        visualizer.generate_sdf_objs_with_full_network(f"results/model_trecontruct/phase3/mesh_reconstruct_{i}.obj", full_trainer.full_dataset[i][0])
+    for i in tqdm(range(0, len(deepsdf_trainer.deepsdf_dataset))):
+        visualizer.generate_sdf_objs("results/model_reconstruct/phase1", i)
+        visualizer.generate_sdf_objs_with_full_network(f"results/model_reconstruct/phase3/mesh_reconstruct_{i}.obj", full_trainer.full_dataset[i][0])
     
     writer.close()
